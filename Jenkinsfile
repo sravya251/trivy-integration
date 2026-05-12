@@ -1,16 +1,22 @@
 pipeline {
     agent any
 
+    options {
+        retry(2)
+        disableConcurrentBuilds()
+    }
+
     environment {
         IMAGE_NAME = "myapp"
-        IMAGE_TAG  = "latest"
+        IMAGE_TAG = "latest"
     }
 
     stages {
 
         stage('Clone Code') {
             steps {
-                git branch: 'master', url: 'https://github.com/sravya251/trivy-integration.git'
+                git branch: 'master',
+                url: 'https://github.com/sravya251/trivy-integration.git'
             }
         }
 
@@ -29,9 +35,7 @@ pipeline {
         stage('Trivy Scan - Image') {
             steps {
                 sh """
-                trivy image --scanners vuln \
-                --ignore-unfixed \
-                --severity CRITICAL \
+                trivy image --severity HIGH,CRITICAL \
                 --exit-code 1 \
                 --format json \
                 -o trivy-report.json \
@@ -43,15 +47,19 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: 'trivy-report.json', fingerprint: true
-        }
-
-        failure {
-            echo '❌ Build failed due to vulnerabilities!'
+            script {
+                if (fileExists('trivy-report.json')) {
+                    archiveArtifacts artifacts: 'trivy-report.json'
+                }
+            }
         }
 
         success {
-            echo '✅ Image is safe. Proceed to deploy.'
+            echo '✅ Safe image'
+        }
+
+        failure {
+            echo '❌ Build failed'
         }
     }
 }
