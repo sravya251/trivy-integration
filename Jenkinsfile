@@ -16,7 +16,7 @@ pipeline {
 
             steps {
 
-                git branch: 'master', url: 'https://github.com/yaswanth-1999/trivy-integration.git'
+                git branch: 'master', url: 'https://github.com/sravya251/trivy-integration.git'
 
             }
 
