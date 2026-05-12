@@ -4,11 +4,12 @@ pipeline {
     options {
         retry(2)
         disableConcurrentBuilds()
+        timeout(time: 30, unit: 'MINUTES')
     }
 
     environment {
         IMAGE_NAME = "myapp"
-        IMAGE_TAG = "latest"
+        IMAGE_TAG  = "latest"
     }
 
     stages {
@@ -35,8 +36,11 @@ pipeline {
         stage('Trivy Scan - Image') {
             steps {
                 sh """
-                trivy image --severity HIGH,CRITICAL \
+                trivy image \
+                --db-repository ghcr.io/aquasecurity/trivy-db:2 \
+                --severity HIGH,CRITICAL \
                 --exit-code 1 \
+                --no-progress \
                 --format json \
                 -o trivy-report.json \
                 ${IMAGE_NAME}:${IMAGE_TAG}
@@ -49,13 +53,13 @@ pipeline {
         always {
             script {
                 if (fileExists('trivy-report.json')) {
-                    archiveArtifacts artifacts: 'trivy-report.json'
+                    archiveArtifacts artifacts: 'trivy-report.json', fingerprint: true
                 }
             }
         }
 
         success {
-            echo '✅ Safe image'
+            echo '✅ Image is safe'
         }
 
         failure {
