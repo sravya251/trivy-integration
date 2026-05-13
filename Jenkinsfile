@@ -34,7 +34,7 @@ pipeline {
 
         stage('Trivy Scan') {
             steps {
-                sh """
+                sh '''
                 trivy image \
                 --db-repository ghcr.io/aquasecurity/trivy-db:2 \
                 --severity HIGH,CRITICAL \
@@ -43,7 +43,7 @@ pipeline {
                 --format json \
                 -o trivy-report.json \
                 ${IMAGE_NAME}:${IMAGE_TAG}
-                """
+                '''
             }
         }
     }
@@ -51,14 +51,12 @@ pipeline {
     post {
 
         always {
-            node('master') {
-                script {
-                    if (fileExists('trivy-report.json')) {
-                        archiveArtifacts artifacts: 'trivy-report.json', fingerprint: true
-                    }
-                    cleanWs()
+            script {
+                if (fileExists('trivy-report.json')) {
+                    archiveArtifacts artifacts: 'trivy-report.json', fingerprint: true
                 }
             }
+            cleanWs()
         }
 
         success {
