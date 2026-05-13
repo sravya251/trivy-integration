@@ -35,6 +35,8 @@ pipeline {
         stage('Trivy Scan') {
             steps {
                 sh '''
+                export TRIVY_CACHE_DIR=/tmp/trivy-cache
+
                 trivy image \
                 --db-repository ghcr.io/aquasecurity/trivy-db:2 \
                 --severity HIGH,CRITICAL \
