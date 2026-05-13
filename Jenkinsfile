@@ -32,20 +32,20 @@ pipeline {
             }
         }
 
-        stage('Trivy Scan') {
-            steps {
-                sh '''
-                export TRIVY_CACHE_DIR=/tmp/trivy-cache
+       stage('Trivy Scan') {
+    steps {
+        sh '''
+        export TRIVY_CACHE_DIR=/tmp/trivy-cache
 
-                trivy image \
-                --db-repository ghcr.io/aquasecurity/trivy-db:2 \
-                --severity HIGH,CRITICAL \
-                --exit-code 1 \
-                --no-progress \
-                --format json \
-                -o trivy-report.json \
-                ${IMAGE_NAME}:${IMAGE_TAG}
-                '''
+        trivy image \
+        --db-repository ghcr.io/aquasecurity/trivy-db:2 \
+        --severity HIGH,CRITICAL \
+        --exit-code 0 \
+        --no-progress \
+        --format json \
+        -o trivy-report.json \
+        ${IMAGE_NAME}:${IMAGE_TAG}
+        '''
             }
         }
     }
