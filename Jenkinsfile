@@ -14,9 +14,6 @@ pipeline {
     stages {
 
         stage('Clone Code') {
-            options {
-                retry(2)
-            }
             steps {
                 git branch: 'master',
                 url: 'https://github.com/sravya251/trivy-integration.git'
@@ -54,7 +51,7 @@ pipeline {
     post {
 
         always {
-            node {
+            node('master') {
                 script {
                     if (fileExists('trivy-report.json')) {
                         archiveArtifacts artifacts: 'trivy-report.json', fingerprint: true
