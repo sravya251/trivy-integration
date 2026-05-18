@@ -1,9 +1,5 @@
-FROM python:3.7
+FROM alpine:3.10
 
-WORKDIR /app
+RUN apk add --no-cache bash
 
-COPY . .
-
-RUN pip install flask==0.5
-
-CMD ["python", "app.py"]
+CMD ["sh"]
