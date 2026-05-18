@@ -1,7 +1,9 @@
-FROM python:3.11-alpine
+FROM python:3.7
 
 WORKDIR /app
 
 COPY . .
 
-CMD ["python","app.py"]
+RUN pip install flask==0.5
+
+CMD ["python", "app.py"]
